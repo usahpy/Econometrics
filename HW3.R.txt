@@ -1,0 +1,120 @@
+#***TWe investigate the relationship between mpg (gas mileage) and weight (car’s weight in #pounds). The variable foreign indicates whether the car is domestic or foreign made. This #is a categorical variable, with categories “Domestic”, and “Foreign”.***#
+
+rm(list=ls()) #rm(list of objects) removes all objects from memory
+graphics.off() #Closing all previously open graphs
+
+#Attach TTestFun.R used for plots of t-distribution
+source("http://online.sfsu.edu/mbar/ECON312_files/TTestFun.R") 
+
+# Packages used
+if (!require("foreign")) install.packages("foreign") #Install "foreign" package if not installed
+library(foreign) #Attach the foreign package
+
+#****************************************************************
+#                            Question 3                         *
+#****************************************************************
+#Loading data into R
+auto <- read.dta("http://www.stata-press.com/data/r12/auto.dta")
+
+# 3-a Create a new variable weight100, which is the weight in hundreds of pounds
+auto$weight100 <- auto$weight/100 #Weight in 100s pounds
+myvars = c("mpg","weight100","foreign")
+summary(subset(auto, select=myvars)) #Summary of selected variables
+
+# 3-c Present a summary statistics of mpg by categories of foreign
+tapply(auto$mpg, auto$foreign, summary, na.rm=TRUE) #Summary of mpg by categories of foreign
+
+# 3-e Present a boxplot diagram that visually summarizes the mpg by categories of foreign.
+boxplot(mpg~foreign,data=auto, 
+        main="MPG by Type of Manufacturer",
+        ylab="Miles Per Gallon",col=c("blue","red"))
+
+# 3-f Present the R commands and R output here.
+model1 <- lm(mpg ~ weight100, data = auto) #OLS estimation
+summary(model1) #Basic Regression output
+
+# 3-h (Critical Values, Optional)
+alpha <- 0.05 #Significance level of the test
+df <- df.residual(model1) #Degrees of freedom of RSS
+paste("-t_c = ", qt(alpha/2, df, lower.tail = TRUE)) #Lower tail critical value
+paste(" t_c = ", qt(alpha/2, df, lower.tail = FALSE)) #Upper tail critical value
+se <- summary(model1)$coefficients["weight100",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 0 #Null hypothesis
+t_value <- (coef(model1)[2] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"twosided",1001,5) #Plotting the t-distribution, under H0
+
+# 3-i (Critical Values, Optional)
+alpha <- 0.01 #Significance level of the test
+df <- df.residual(model1) #Degrees of freedom of RSS
+paste("-t_c = ", qt(alpha/2, df, lower.tail = TRUE)) #Lower tail critical value
+paste(" t_c = ", qt(alpha/2, df, lower.tail = FALSE)) #Upper tail critical value
+se <- summary(model1)$coefficients["weight100",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 0 #Null hypothesis
+t_value <- (coef(model1)[2] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"twosided",1001,5) #Plotting the t-distribution, under H0
+
+# 3-j (Critical Values, Optional)
+alpha <- 0.05 #Significance level of the test
+df <- df.residual(model1) #Degrees of freedom of RSS
+paste("-t_c = ", qt(alpha, df, lower.tail = TRUE)) #Lower tail critical value
+se <- summary(model1)$coefficients["weight100",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 0 #Null hypothesis
+t_value <- (coef(model1)[2] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"lower",1001,5) #Plotting the t-distribution, under H0
+
+#****************************************************************
+#                            Question 4                         *
+#****************************************************************
+#Loading data into R
+wage <- read.csv("http://online.sfsu.edu/mbar/ECON312_files/wage21.csv")
+
+# Summary of key variables
+myvars = c("EARNINGS","S", "EXP") 
+summary(subset(wage, select=myvars))
+cor(wage[myvars]) #Sample correlation matrix
+pairs(subset(wage, select=myvars)) #Scatter of pairs of variables
+
+# 4-a Run the regression of earnings on schooling and experience and present the R command and R regression output.
+model2 <- lm(EARNINGS ~ S + EXP, data = wage)
+summary(model2)
+
+# 4-c we want to test whether there is any relationship between earnings and experience.
+alpha <- 0.05 #Significance level of the test
+df <- df.residual(model2) #Degrees of freedom of RSS
+paste("-t_c = ", qt(alpha/2, df, lower.tail = TRUE)) #Lower tail critical value
+paste(" t_c = ", qt(alpha/2, df, lower.tail = FALSE)) #Upper tail critical value
+se <- summary(model2)$coefficients["EXP",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 0 #Null hypothesis
+t_value <- (coef(model2)["EXP"] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"twosided",1001,5) #Plotting the t-distribution, under H0
+
+# 4-d economic theory tells us that if experience has any effect on earnings, the effect must be positive.
+alpha <- 0.05 #Significance level of the test
+df <- df.residual(model2) #Degrees of freedom of RSS
+paste(" t_c = ", qt(alpha, df, lower.tail = FALSE)) #Upper tail critical value
+se <- summary(model2)$coefficients["EXP",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 0 #Null hypothesis
+t_value <- (coef(model2)["EXP"] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"upper",1001,5) #Plotting the t-distribution, under H0
+
+# 4-e economic theory tells us that each year of schooling increases the hourly earnings by $4.5 per hour
+alpha <- 0.05 #Significance level of the test
+df <- df.residual(model2) #Degrees of freedom of RSS
+paste("-t_c = ", qt(alpha/2, df, lower.tail = TRUE)) #Lower tail critical value
+paste(" t_c = ", qt(alpha/2, df, lower.tail = FALSE)) #Upper tail critical value
+se <- summary(model2)$coefficients["S",2] #Extracting the estimated standard error of slope coefficient
+beta_0 <- 4.5 #Null hypothesis
+t_value <- (coef(model2)["S"] - beta_0)/se #Calculates the realized value of the test statistic
+
+# Visualization of the test
+TTestFun(alpha,df,"twosided",1001,5) #Plotting the t-distribution, under H0
