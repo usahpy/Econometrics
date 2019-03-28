@@ -1,0 +1,38 @@
+#This question uses the wage21 data set, posted on the course webpage in several formats. 
+
+rm(list=ls()) #rm(list of objects) removes all objects from memory
+graphics.off() #Closgng all previously open graphs
+
+#Question 7
+#Loading data into R
+wage <- read.csv("http://online.sfsu.edu/mbar/ECON312_files/wage21.csv")
+
+#7-c Estimate the model’s coefficients using OLS, and report the estimates b_1,b_2 . The commands in R are:
+model1 <- lm(EARNINGS ~ S, data = wage) #OLS estimation
+b <- coef(model1) #Storing the estimated coefficients in vector b
+b  #Displaying the estimated coefficeints
+
+#7-d Interpret the regression coefficients
+summary(wage$S) #Summary statistics of Schooling
+
+#7-e a.	Based on your estimates, what is your predicted hourly earnings for an individual with 16 years of schooling? 
+EARN_pred <- b[1] + b[2]*16 #Calculating the prediction
+EARN_pred #Display the prediction
+
+#7-f Based on your estimates, what is your predicted hourly earnings for an individual with 20 years of schooling? 
+EARN_pred <- b[1] + b[2]*20 #Calculating the prediction
+EARN_pred #Display the prediction
+
+#7-g Calculate and interpret the value of  in this model. Use the command summary(model1) in R. This gives a table with various statistics
+summary(model1) #Display the estimation results
+
+#7-h Plot the graph of actual values of EARNINGS vs S, and add the fitted equation 
+windows()
+plot(EARNINGS ~ S, data=wage, main="Earnings vs Schooling",
+     col="blue",lwd=2)
+abline(coef(model1),col="red",lwd=2) #Fitted equation
+legend("topleft", legend = c("data","fitted equation"),
+       col=c("blue","red"), lty=c(0,1), pch=c(1,NA),lwd=2)
+grid() #Optional, add grid to figure
+
+
